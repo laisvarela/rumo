@@ -6,7 +6,7 @@ class AppTheme {
       colorScheme: ColorScheme.fromSeed(
         seedColor: const Color(0xFF4E61F6),
         brightness: Brightness.light,
-        primary:  Color(0xFF4E61F6),
+        primary: Color(0xFF4E61F6),
       ),
       // Config visual do Box
       bottomSheetTheme: const BottomSheetThemeData(
@@ -39,7 +39,35 @@ class AppTheme {
           padding: const EdgeInsets.symmetric(vertical: 16),
         ),
       ),
-    );
 
+      /// InputDecorationTheme controla a aparência dos inputs de texto
+      inputDecorationTheme: InputDecorationTheme(
+        hintStyle: TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          color: Color(0xFF9EA2AE),
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Color(0xFFE5E7EA), width: 1.5),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Color(0xFFE5E7EA), width: 1.5),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Color(0xFFEE443F)),
+        ),
+        filled: true,
+        fillColor: WidgetStateColor.resolveWith((states) {
+          if (states.contains(WidgetState.error)) {
+            return Color(0xFFFDECEC);
+          }
+          return Color(0xFFF9FAFB);
+        }),
+      ),
+    );
   }
 }

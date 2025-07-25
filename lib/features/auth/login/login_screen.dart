@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:rumo/core/asset_images.dart';
+import 'package:rumo/features/auth/repositories/auth_repository.dart';
 import 'package:rumo/features/onboarding/routes/onboarding_routes.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -12,7 +13,10 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-
+  bool hidePassword = true;
+  bool isLoading = false;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -124,37 +128,9 @@ class _LoginState extends State<LoginScreen> {
                               spacing: 16,
                               children: [
                                 TextFormField(
+                                  controller: _emailController,
                                   decoration: InputDecoration(
                                     hintText: 'E-mail',
-                                    hintStyle: TextStyle(
-                                      fontFamily: 'Inter',
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                      color: Color(0xFF9EA2AE),
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                      borderSide: BorderSide(
-                                        color: Color(0xFFE5E7EA),
-                                        width: 1,
-                                      ),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                      borderSide: BorderSide(
-                                        color: Color(0xFFE5E7EA),
-                                        width: 1,
-                                      ),
-                                    ),
-                                    errorBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                      borderSide: BorderSide(
-                                        color: Colors.red,
-                                        width: 1,
-                                      ),
-                                    ),
-                                    fillColor: Color(0xFFF9FAFB),
-                                    filled: true,
                                   ),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
@@ -164,38 +140,22 @@ class _LoginState extends State<LoginScreen> {
                                   },
                                 ),
                                 TextFormField(
-                                  obscureText: true,
+                                  controller: _passwordController,
+                                  obscureText: hidePassword,
                                   decoration: InputDecoration(
                                     hintText: 'Senha',
-                                    hintStyle: TextStyle(
-                                      fontFamily: 'Inter',
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                      color: Color(0xFF9EA2AE),
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                      borderSide: BorderSide(
-                                        color: Color(0xFFE5E7EA),
-                                        width: 1,
+                                    suffixIcon: IconButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          hidePassword = !hidePassword;
+                                        });
+                                      },
+                                      icon: Icon(
+                                        hidePassword
+                                            ? Icons.visibility_off
+                                            : Icons.visibility,
                                       ),
                                     ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                      borderSide: BorderSide(
-                                        color: Color(0xFFE5E7EA),
-                                        width: 1,
-                                      ),
-                                    ),
-                                    errorBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                      borderSide: BorderSide(
-                                        color: Colors.red,
-                                        width: 1,
-                                      ),
-                                    ),
-                                    fillColor: Color(0xFFF9FAFB),
-                                    filled: true,
                                   ),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
@@ -213,17 +173,68 @@ class _LoginState extends State<LoginScreen> {
                           width: double
                               .maxFinite, // botão preenche toda a largura disponível
                           child: FilledButton(
-                            onPressed: () {
-                              if (_formKey.currentState!.validate()) {
-                                Navigator.pushNamed(
-                                  context,
-                                  OnboardingRoutes.onboardingScreen,
-                                );
+                            onPressed: () async {
+                              if (isLoading) return;
+                              final bool isValid = _formKey.currentState!
+                                  .validate();
+                              if (isValid) {
+                                try {
+                                  setState(() {
+                                    isLoading = true;
+                                  });
+                                  final authRepository = AuthRepository();
+                                  await authRepository.login(
+                                    email: _emailController.text,
+                                    password: _passwordController.text,
+                                  );
+                                  if (context.mounted) {
+                                    Navigator.of(context).popUntil((route) => route.isFirst);
+                                    Navigator.of(context).pushReplacementNamed('/home');
+                                  }
+                                } on AuthException catch (e) {
+                                  if (!context.mounted) return;
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: Text('Erro'),
+                                        content: Text(e.getMessage()),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Text('Ok'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                } finally {
+                                  // vai executar o finally independente se cair no catch
+                                  setState(() {
+                                    isLoading = false;
+                                  });
+                                }
                               }
                             },
-                            child: Text('Entrar'),
+                            child: Builder(
+                              builder: (context) {
+                                if (isLoading) {
+                                  return SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                    ),
+                                  );
+                                }
+                                return Text('Entrar');
+                              },
+                            ),
                           ),
                         ),
+                        SizedBox(height: 16),
                       ],
                     ),
                   ),
