@@ -2,22 +2,30 @@
 
 Bootcamp remoto focado em **desenvolvimento Flutter**.  
 
-## RUMO
+## 🚀 RUMO
 
-Este projeto `Flutter` demonstra desde conceitos básicos, como validação de dados em formulários, até tópicos mais avançados, incluindo integração com Firebase para autenticação e armazenamento de dados. O código serve como referência para boas práticas em organização de telas, navegação, uso de temas personalizados e manipulação de estados.
+Rumo é um projeto `Flutter`de **diário de bordo**, onde é possível:
 
-# Tecnologias utilizadas:
+- 👤 Criar conta e gerenciar perfil
+- 🔐 Fazer login
+- 🗺️ Navegar pelo mapa
+- 📔 Adicionar e visualizar diários
+- 🧭 Explorar conteúdos de outros usuários
+- 🤝 Seguir outras contas
 
-- Flutter
-- Firebase Auth
-- Cloud Firestore
+O projeto aplica desde conceitos básicos, como validação de dados em formulários, até conceitos mais avançados, como integração com Firebase para autenticação e armazenamento de dados.
 
-# Principais conceitos aplicados:
+# 🛠️ Tecnologias utilizadas:
 
-- Validação de campos de formulário
-- Gerenciamento de estado
-- Navegação entre telas
-- Temas customizados
-- Integração com serviços externos (Firebase)
+- 💙Flutter
+- 🔥Firebase
+
+# 🧩 Principais conceitos aplicados:
+
+- 📝 Validação de campos de formulário  
+- 🔄 Gerenciamento de estado  
+- 🧭 Navegação entre telas  
+- 🎨 Temas customizados  
+- ☁️ Integração com serviços externos (Firebase)  
 
 # Projeto para fins de estudo e prática de Flutter.
