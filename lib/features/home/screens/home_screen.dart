@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:rumo/features/auth/repositories/auth_repository.dart';
 import 'package:rumo/features/onboarding/routes/onboarding_routes.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -26,6 +28,8 @@ class _HomeScreenState extends State<HomeScreen> {
               width: double.maxFinite,
               child: FilledButton(
                 onPressed: () {
+                  final authRepository = AuthRepository();
+                  authRepository.logout();
                   Navigator.pushNamed(
                     context,
                     OnboardingRoutes.onboardingScreen,

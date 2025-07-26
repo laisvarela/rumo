@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:rumo/core/asset_images.dart';
 import 'package:rumo/features/auth/repositories/auth_repository.dart';
+import 'package:rumo/features/auth/widgets/forgot_password.dart';
 import 'package:rumo/features/onboarding/routes/onboarding_routes.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -188,8 +189,12 @@ class _LoginState extends State<LoginScreen> {
                                     password: _passwordController.text,
                                   );
                                   if (context.mounted) {
-                                    Navigator.of(context).popUntil((route) => route.isFirst);
-                                    Navigator.of(context).pushReplacementNamed('/home');
+                                    Navigator.of(
+                                      context,
+                                    ).popUntil((route) => route.isFirst);
+                                    Navigator.of(
+                                      context,
+                                    ).pushReplacementNamed('/home');
                                   }
                                 } on AuthException catch (e) {
                                   if (!context.mounted) return;
@@ -234,7 +239,17 @@ class _LoginState extends State<LoginScreen> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 16),
+                        Center(
+                          child: TextButton(
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => ForgotPassword(),
+                              );
+                            },
+                            child: Text('Esqueci minha senha'),
+                          ),
+                        ),
                       ],
                     ),
                   ),

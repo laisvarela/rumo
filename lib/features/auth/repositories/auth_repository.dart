@@ -37,22 +37,34 @@ class AuthRepository {
     }
   }
 
-  Future login({required String email, required String password}) async {
+  Future<void> login({required String email, required String password}) async {
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
     } on FirebaseAuthException catch (e) {
-      throw AuthException(code: 'E-mail inválido.');
+      throw AuthException(code: e.code);
     }
   }
 
   Future<void> logout() async {
     try {
       await FirebaseAuth.instance.signOut();
+
+      // verifica se o logout foi realizado com sucesso, o log deve retornar null
+      final currentUser = FirebaseAuth.instance.currentUser;
+      log("User info: ${currentUser?.email}");
     } on AuthException catch (e) {
-      throw AuthException(code: 'Erro ao sair da conta.');
+      throw AuthException(code: e.code);
+    }
+  }
+
+  Future<void> sendPasswordResetEmail({required String email}) async {
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+    } on AuthException catch (e) {
+      throw AuthException(code: e.code);
     }
   }
 }
@@ -72,8 +84,18 @@ class AuthException implements Exception {
         return "Usuário inválido";
       case "wrong-password":
         return "Senha incorreta.";
+      case "user-not-found":
+        return "Usuário não encontrado.";
+      case "auth/invalid-email":
+        return "E-mail inválido.";
+      case "auth/user-not-found":
+        return "Usuário não encontrado.";
+      case "auth/missing-email":
+        return "Insira um e-mail.";
+      case "invalid-credential":
+        return "E-mail ou senha inválido.";
       default:
-        return "Erro desconhecido";
+        return "Erro desconhecido $code";
     }
   }
 }
