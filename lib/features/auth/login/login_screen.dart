@@ -75,6 +75,7 @@ class _LoginState extends State<LoginScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
+                spacing: 16,
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(left: 16, bottom: 16),
@@ -247,7 +248,15 @@ class _LoginState extends State<LoginScreen> {
                                 builder: (context) => ForgotPassword(),
                               );
                             },
-                            child: Text('Esqueci minha senha'),
+                            child: Text(
+                              'Esqueci minha senha',
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black,
+                              ),
+                            ),
                           ),
                         ),
                       ],
