@@ -4,7 +4,7 @@ Bootcamp remoto focado em **desenvolvimento Flutter**.
 
 ## 🚀 RUMO
 
-Rumo é um projeto `Flutter`de **diário de bordo**, onde é possível:
+Rumo é um projeto `Flutter` de **diário de bordo**, onde é possível:
 
 - 👤 Criar conta e gerenciar perfil
 - 🔐 Fazer login
@@ -28,4 +28,4 @@ O projeto aplica desde conceitos básicos, como validação de dados em formulá
 - 🎨 Temas customizados  
 - ☁️ Integração com serviços externos (Firebase)  
 
-# Projeto para fins de estudo e prática de Flutter.
+`Projeto para fins de estudo e prática de Flutter.`
