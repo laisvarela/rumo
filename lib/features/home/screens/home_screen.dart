@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:rumo/core/asset_images.dart';
+import 'package:rumo/features/diary/screens/diary_screen.dart';
+import 'package:rumo/features/home/screens/profile_screen.dart';
+import 'package:rumo/features/home/widgets/bottom_nav_item.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,6 +14,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int currentIndex = 0;
+
+  void onSelectItem(int index) {
+    setState(() {
+      currentIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,119 +45,76 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),*/
       resizeToAvoidBottomInset: false,
-      bottomNavigationBar: BottomAppBar(
-        child: Row(
-          // spaceAround tenta adicionar os objetos em espaços iguais
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  currentIndex = 0;
-                });
-              },
-              child: BottomNavItem(
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          border: Border(top: BorderSide(color: Color(0xFFF3F3F3), width: 1)),
+        ),
+        child: BottomAppBar(
+          color: Colors.white,
+          child: Row(
+            // spaceAround tenta adicionar os objetos em espaços iguais
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              BottomNavItem(
                 icon: AssetImages.iconMap,
                 label: 'Mapa',
+                index: 0,
                 selected: currentIndex == 0,
+                onSelectItem: onSelectItem,
               ),
-            ),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  currentIndex = 1;
-                });
-              },
-              child: BottomNavItem(
+
+              BottomNavItem(
                 icon: AssetImages.iconDiary,
                 label: 'Diários',
+                index: 1,
                 selected: currentIndex == 1,
+                onSelectItem: onSelectItem,
               ),
-            ),
-            IconButton.filled(
-              onPressed: () {},
-              icon: SvgPicture.asset(
-                AssetImages.iconAdd,
-                width: 20,
-                height: 20,
-                colorFilter: ColorFilter.mode(Color(0xFF4E61F6), BlendMode.srcATop),
+
+              IconButton.filled(
+                onPressed: () {},
+                icon: SvgPicture.asset(
+                  AssetImages.iconAdd,
+                  width: 20,
+                  height: 20,
+                  colorFilter: ColorFilter.mode(
+                    Color(0xFF4E61F6),
+                    BlendMode.srcATop,
+                  ),
+                ),
+                style: IconButton.styleFrom(backgroundColor: Color(0xFFDDE1FF)),
               ),
-              style: IconButton.styleFrom(backgroundColor: Color(0xFFDDE1FF)),
-            ),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  currentIndex = 2;
-                });
-              },
-              child: BottomNavItem(
+
+              BottomNavItem(
                 icon: AssetImages.iconCompass,
                 label: 'Explorar',
+                index: 2,
                 selected: currentIndex == 2,
+                onSelectItem: onSelectItem,
               ),
-            ),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  currentIndex = 3;
-                });
-              },
-              child: BottomNavItem(
+
+              BottomNavItem(
                 icon: AssetImages.iconProfile,
                 label: 'Perfil',
+                index: 3,
                 selected: currentIndex == 3,
+                onSelectItem: onSelectItem,
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       body: Builder(
         builder: (context) {
           return switch (currentIndex) {
-            1 => Center(child: Text('Diários')),
+            1 => DiaryScreen(),
             2 => Center(child: Text('Explorar')),
-            3 => Center(child: Text('Perfil')),
+            3 => ProfileScreen(),
             _ => Center(child: Text('Mapa')),
           };
         },
       ),
-    );
-  }
-}
-
-class BottomNavItem extends StatelessWidget {
-  final String icon;
-  final String label;
-  final bool selected;
-  const BottomNavItem({
-    required this.icon,
-    required this.label,
-    required this.selected,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final color = selected ? Color(0xFF4E61F6) : Color(0xFF757575);
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        SvgPicture.asset(
-          icon,
-          width: 20,
-          height: 20,
-          colorFilter: ColorFilter.mode(color, BlendMode.srcATop),
-        ),
-        Text(
-          label,
-          style: TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 12,
-            fontWeight: FontWeight.w400,
-            color: color,
-          ),
-        ),
-      ],
     );
   }
 }

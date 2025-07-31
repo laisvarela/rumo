@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:rumo/core/asset_images.dart';
 import 'package:rumo/features/onboarding/routes/onboarding_routes.dart';
@@ -107,14 +108,113 @@ class _ProfileScreenState extends State<ProfileScreen> {
             SizedBox(height: 20),
             SizedBox(
               width: double.maxFinite,
-              child: FilledButton(
+              child: OutlinedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, OnboardingRoutes.onboardingScreen);
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (context) => BottomSheet(
+                      constraints: BoxConstraints.expand(
+                        width: double.maxFinite,
+                        height: 261,
+                      ),
+                      onClosing: () {},
+                      builder: (context) => Padding(
+                        padding: EdgeInsetsGeometry.only(
+                          top: 24,
+                          left: 24,
+                          right: 24,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Expanded(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(
+                                        'Sair da conta',
+                                        style: TextStyle(
+                                          fontFamily: 'Inter',
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xFF303030),
+                                        ),
+                                      ),
+                                      SizedBox(width: 8),
+                                        GestureDetector(
+                                          onTap: () => Navigator.of(context).pop(),
+                                          child: Icon(Icons.close),
+                                        ),
+                                      
+                                    ],
+                                  ),
+
+                                  
+                                ],
+                              ),
+                            ),
+
+                            SizedBox(height: 16),
+                            Text(
+                              'Tem certeza que deseja sair?',
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xFF757575),
+                              ),
+                            ),
+                            SizedBox(height: 32),
+                            SizedBox(
+                              width: double.maxFinite,
+                              child: FilledButton(
+                                onPressed: () {},
+                                child: Text(
+                                  'Permanecer na minha conta',
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFFFFFFFF),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 12),
+                            Center(
+                              child: TextButton(
+                                onPressed: () async {
+                                  await FirebaseAuth.instance.signOut();
+                                  if (context.mounted) {
+                                    // (_) => false fecha todas as telas
+                                    Navigator.popUntil(context, (_) => false);
+                                    Navigator.pushNamed(
+                                      context,
+                                      OnboardingRoutes.onboardingScreen,
+                                    );
+                                  }
+                                },
+                                child: Text(
+                                  'Sair da minha conta',
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFFEE443F),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
                 },
-                style: FilledButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  side: BorderSide(color: Color(0xFF4E61F6), width: 2),
-                ),
                 child: Text(
                   "Sair",
                   style: TextStyle(

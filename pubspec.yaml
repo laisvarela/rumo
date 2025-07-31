@@ -33,7 +33,11 @@ dependencies:
   firebase_core: ^3.15.1
   flutter:
     sdk: flutter
+  flutter_dotenv: ^5.2.1
+  flutter_map: ^8.1.1
   flutter_svg: ^2.2.0
+  latlong2: ^0.9.1
+  location: ^8.0.1
 
 dev_dependencies:
   flutter_test:
@@ -59,6 +63,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/
+    - .env
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

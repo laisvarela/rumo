@@ -55,25 +55,14 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                   email: _emailController.text,
                 );
                 if (context.mounted) {
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: Text('Sucesso'),
-                      content: Text('E-mail enviado com sucesso!'),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: Text('Ok'),
-                        ),
-                      ],
-                    ),
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('E-mail enviado com sucesso!')),
                   );
+                  Navigator.of(context).pop();
                 }
               } on AuthException catch (e) {
                 if (!context.mounted) return;
-                showDialog(
+                /*showDialog(
                   context: context,
                   builder: (context) {
                     return AlertDialog(
@@ -87,9 +76,11 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                           child: Text('Ok'),
                         ),
                       ],
+                    );*/
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(e.getMessage())),
                     );
-                  },
-                );
+
               } finally {
                 setState(() {
                   isLoading = false;

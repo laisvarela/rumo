@@ -13,8 +13,8 @@ class AppTheme {
         backgroundColor: Color(0xFFFFFFFF),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(16),
-            topRight: Radius.circular(16),
+            topLeft: Radius.circular(32),
+            topRight: Radius.circular(32),
           ),
           side: BorderSide(color: Color(0xFFD9D9D9), width: 1),
         ),
