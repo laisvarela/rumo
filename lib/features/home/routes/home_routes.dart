@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:rumo/features/home/screens/home_screen.dart';
-import 'package:rumo/features/home/screens/profile_screen.dart';
+import 'package:rumo/features/user/screens/profile_screen.dart';
 
 class HomeRoutes {
   static const String homeScreen = '/home';

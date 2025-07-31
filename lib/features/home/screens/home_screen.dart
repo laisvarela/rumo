@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:rumo/core/asset_images.dart';
 import 'package:rumo/features/diary/screens/diary_screen.dart';
-import 'package:rumo/features/home/screens/profile_screen.dart';
+import 'package:rumo/features/user/screens/profile_screen.dart';
 import 'package:rumo/features/home/widgets/bottom_nav_item.dart';
 
 class HomeScreen extends StatefulWidget {
