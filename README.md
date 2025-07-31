@@ -1,16 +1,31 @@
-# rumo
+# UEEK CONNECT
 
-A new Flutter project.
+Bootcamp remoto focado em **desenvolvimento Flutter**.  
 
-## Getting Started
+## 🚀 RUMO
 
-This project is a starting point for a Flutter application.
+Rumo é um projeto `Flutter` de **diário de bordo**, onde é possível:
 
-A few resources to get you started if this is your first Flutter project:
+- 👤 Criar conta e gerenciar perfil
+- 🔐 Fazer login
+- 🗺️ Navegar pelo mapa
+- 📔 Adicionar e visualizar diários
+- 🧭 Explorar conteúdos de outros usuários
+- 🤝 Seguir outras contas
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+O projeto aplica desde conceitos básicos, como validação de dados em formulários, até conceitos mais avançados, como integração com Firebase para autenticação e armazenamento de dados.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+# 🛠️ Tecnologias utilizadas:
+
+- 💙Flutter
+- 🔥Firebase
+
+# 🧩 Principais conceitos aplicados:
+
+- 📝 Validação de campos de formulário  
+- 🔄 Gerenciamento de estado  
+- 🧭 Navegação entre telas  
+- 🎨 Temas customizados  
+- ☁️ Integração com serviços externos (Firebase)  
+
+`Projeto para fins de estudo e prática de Flutter.`
