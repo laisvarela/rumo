@@ -18,6 +18,7 @@ class SignOutBottomSheet extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              // Expanded nesse caso é usado para que o texto ocupe o espaço, deixando o botão de fechar no final
               Expanded(
                 child: Text(
                   'Sair da conta',

@@ -1,7 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:rumo/core/asset_images.dart';
-import 'package:rumo/features/onboarding/routes/onboarding_routes.dart';
 import 'package:rumo/features/user/widgets/sign_out_bottom_sheet.dart';
 
 class ProfileScreen extends StatefulWidget {

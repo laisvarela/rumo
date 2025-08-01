@@ -108,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Builder(
         builder: (context) {
           return switch (currentIndex) {
-            1 => DiaryScreen(),
+            1 => DiariesScreen(),
             2 => Center(child: Text('Explorar')),
             3 => ProfileScreen(),
             _ => Center(child: Text('Mapa')),
