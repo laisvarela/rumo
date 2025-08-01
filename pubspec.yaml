@@ -38,6 +38,7 @@ dependencies:
   flutter_svg: ^2.2.0
   geocoding: ^4.0.0
   geolocator: ^14.0.2
+  image_picker: ^1.1.2
   latlong2: ^0.9.1
   location: ^8.0.1
 

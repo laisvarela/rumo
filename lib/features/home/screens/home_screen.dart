@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:rumo/core/asset_images.dart';
 import 'package:rumo/features/diary/screens/diary_screen.dart';
 import 'package:rumo/features/user/screens/profile_screen.dart';
 import 'package:rumo/features/home/widgets/bottom_nav_item.dart';
+import 'package:rumo/features/user/widgets/create_diary_bottom_sheet.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -73,17 +73,19 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
 
               IconButton.filled(
-                onPressed: () {},
-                icon: SvgPicture.asset(
-                  AssetImages.iconAdd,
-                  width: 20,
-                  height: 20,
-                  colorFilter: ColorFilter.mode(
-                    Color(0xFF4E61F6),
-                    BlendMode.srcATop,
-                  ),
-                ),
                 style: IconButton.styleFrom(backgroundColor: Color(0xFFDDE1FF)),
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.height * 0.9,
+                    ),
+                    builder: (context) => CreateDiaryBottomSheet(),
+                  );
+                },
+                iconSize: 28,
+                icon: Icon(Icons.add, color: Theme.of(context).primaryColor),
               ),
 
               BottomNavItem(

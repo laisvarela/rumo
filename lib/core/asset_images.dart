@@ -10,4 +10,11 @@ class AssetImages {
   static const String iconProfile = '$_assetsPath/icon_profile.svg';
   static const String iconCompass = '$_assetsPath/icon_compass.svg';
   static const String iconAdd = '$_assetsPath/icon_add.svg';
+  static const String iconCamera = '$_assetsPath/icon_camera.svg';
+  static const String iconLocationPin = '$_assetsPath/icon_location_pin.svg';
+  static const String iconStar = '$_assetsPath/icon_star.svg';
+  static const String iconHalfStar = '$_assetsPath/icon_half_star.svg';
+  static const String iconThreeLines = '$_assetsPath/icon_three_lines.svg';
+  static const String iconTag = '$_assetsPath/icon_tag.svg';
+  static const String iconPhoto = '$_assetsPath/icon_photo.svg';
 }
