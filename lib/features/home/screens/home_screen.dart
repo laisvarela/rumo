@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:rumo/core/asset_images.dart';
 import 'package:rumo/features/diary/screens/diary_screen.dart';
-import 'package:rumo/features/user/screens/profile_screen.dart';
 import 'package:rumo/features/home/widgets/bottom_nav_item.dart';
-import 'package:rumo/features/user/widgets/create_diary_bottom_sheet.dart';
+import 'package:rumo/features/user/screens/profile_screen.dart';
+import 'package:rumo/features/diary/widgets/create_diary_bottom_sheet.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,26 +24,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-
-      /*bottomNavigationBar: BottomNavigationBar(
-        // currentIndex indica qual item está selecionado no momento
-        currentIndex: currentIndex,
-        // onTap é chamado quando o usuário toca em um item da barra
-        // onTap recebe o índice do item tocado.
-        onTap: (index) {
-          // setState atualiza a variável currentIndex com o novo índice
-          setState(() {
-            currentIndex = index;
-          });
-        },
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.map_outlined, size: 20),
-            label: 'Mapa',
-          ),
-        ],
-      ),*/
       resizeToAvoidBottomInset: false,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
@@ -52,26 +32,23 @@ class _HomeScreenState extends State<HomeScreen> {
         child: BottomAppBar(
           color: Colors.white,
           child: Row(
-            // spaceAround tenta adicionar os objetos em espaços iguais
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               BottomNavItem(
                 icon: AssetImages.iconMap,
                 label: 'Mapa',
+                currentSelectedIndex: currentIndex,
                 index: 0,
-                selected: currentIndex == 0,
                 onSelectItem: onSelectItem,
               ),
-
               BottomNavItem(
                 icon: AssetImages.iconDiary,
                 label: 'Diários',
+                currentSelectedIndex: currentIndex,
                 index: 1,
-                selected: currentIndex == 1,
                 onSelectItem: onSelectItem,
               ),
-
               IconButton.filled(
                 style: IconButton.styleFrom(backgroundColor: Color(0xFFDDE1FF)),
                 onPressed: () {
@@ -87,20 +64,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 iconSize: 28,
                 icon: Icon(Icons.add, color: Theme.of(context).primaryColor),
               ),
-
               BottomNavItem(
                 icon: AssetImages.iconCompass,
                 label: 'Explorar',
+                currentSelectedIndex: currentIndex,
                 index: 2,
-                selected: currentIndex == 2,
                 onSelectItem: onSelectItem,
               ),
-
               BottomNavItem(
                 icon: AssetImages.iconProfile,
                 label: 'Perfil',
+                currentSelectedIndex: currentIndex,
                 index: 3,
-                selected: currentIndex == 3,
                 onSelectItem: onSelectItem,
               ),
             ],
@@ -113,7 +88,10 @@ class _HomeScreenState extends State<HomeScreen> {
             1 => DiariesScreen(),
             2 => Center(child: Text('Explorar')),
             3 => ProfileScreen(),
-            _ => Center(child: Text('Mapa')),
+            _ => Scaffold(
+              appBar: AppBar(title: Text('AppBar Mapa')),
+              body: Center(child: Text('Mapa')),
+            ),
           };
         },
       ),
