@@ -7,21 +7,36 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rumo/core/asset_images.dart';
-import 'package:rumo/features/diary/models/create_diary_model.dart';
+import 'package:rumo/features/diary/models/diary_form_result.dart';
+import 'package:rumo/features/diary/models/diary_model.dart';
 import 'package:rumo/features/diary/models/place.dart';
-import 'package:rumo/features/diary/repositories/diary_repository.dart';
+import 'package:rumo/features/diary/repositories/file_repository.dart';
 import 'package:rumo/features/diary/repositories/place_repository.dart';
+import 'package:rumo/features/diary/widgets/create_diary_bottom_sheet/create_diary_state.dart';
 import 'package:rumo/features/diary/widgets/star_rating.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
 
-class CreateDiaryBottomSheet extends StatefulWidget {
-  const CreateDiaryBottomSheet({super.key});
+class DiaryForm extends StatefulWidget {
+  final DiaryModel? diary;
+  final String buttonTitle;
+  final Future<void> Function(DiaryFormResult result) onSubmit;
+  final void Function(String? message)? onError;
+  const DiaryForm({
+    required this.buttonTitle,
+    required this.onSubmit,
+    this.diary,
+    this.onError,
+    super.key,
+  });
 
   @override
-  State<CreateDiaryBottomSheet> createState() => _CreateDiaryBottomSheetState();
+  State<DiaryForm> createState() => _DiaryFormState();
 }
 
-class _CreateDiaryBottomSheetState extends State<CreateDiaryBottomSheet> {
+class _DiaryFormState extends State<DiaryForm> {
   final placeRepository = PlaceRepository();
+  final fileRepository = FileRepository();
 
   final SearchController locationSearchController = SearchController();
   final TextEditingController _tripNameController = TextEditingController();
@@ -32,16 +47,50 @@ class _CreateDiaryBottomSheetState extends State<CreateDiaryBottomSheet> {
   File? selectedImage;
   List<File> tripImages = [];
   double rating = 0;
-  List<Place> places = [];
   Place? selectedPlace;
 
   String? lastQuery;
 
   bool isLoading = false;
+
   Timer? _debounce;
+
+  ValueNotifier<CreateDiaryState> createDiaryState =
+      ValueNotifier<CreateDiaryState>(CreateDiaryInitial());
 
   @override
   void initState() {
+    if (widget.diary != null) {
+      locationSearchController.text = widget.diary!.location;
+      _tripNameController.text = widget.diary!.name;
+      _resumeController.text = widget.diary!.resume;
+
+      isPrivate = widget.diary!.isPrivate;
+      rating = widget.diary!.rating;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await Future.wait([
+          fileRepository.downloadImage(widget.diary!.coverImage).then((file) {
+            selectedImage = file;
+          }),
+          Future.wait(
+            widget.diary!.images.map((imageUrl) async {
+              return fileRepository.downloadImage(imageUrl);
+            }),
+          ).then((tripImagesFiles) {
+            final nonNullTripImages = tripImagesFiles
+                .whereType<File>()
+                .toList();
+            tripImages = nonNullTripImages;
+          }),
+        ]);
+
+        if (mounted) {
+          setState(() {});
+        }
+      });
+    }
+
     super.initState();
 
     locationSearchController.addListener(_onSearchChanged);
@@ -59,7 +108,7 @@ class _CreateDiaryBottomSheetState extends State<CreateDiaryBottomSheet> {
   void _onSearchChanged() {
     final query = locationSearchController.text;
 
-    if(query == lastQuery) return;
+    if (query == lastQuery) return;
 
     setState(() {
       lastQuery = query;
@@ -70,46 +119,27 @@ class _CreateDiaryBottomSheetState extends State<CreateDiaryBottomSheet> {
     if (query.trim().isEmpty) return;
 
     _debounce = Timer(Duration(seconds: 1, milliseconds: 500), () async {
-      final remotePlaces = await placeRepository.getPlaces(query: query);
-      if (!mounted) return;
-      setState(() {
-        places = remotePlaces;
-      });
-
-      if(!locationSearchController.isOpen){
-        locationSearchController.openView();
-      } else {
-        locationSearchController.closeView(query);
-        locationSearchController.openView();
+      try {
+        createDiaryState.value = CreateDiaryLoading();
+        final remotePlaces = await placeRepository.getPlaces(query: query);
+        if (!mounted) return;
+        createDiaryState.value = CreateDiarySuccess(places: remotePlaces);
+      } catch (error, stackTrace) {
+        log("Error fetching places", error: error, stackTrace: stackTrace);
+        createDiaryState.value = CreateDiaryError(
+          message: "Não foi possível encontrar locais",
+        );
       }
     });
   }
 
-  void showSuccess() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Diário criado com sucesso!'),
-        duration: Duration(seconds: 2),
-      ),
-    );
-  }
-
-  void showError(String message) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Erro'),
-          content: Text(message),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
+  void closeAndOpenLocationSearch(String? query) {
+    if (!locationSearchController.isOpen) {
+      locationSearchController.openView();
+    } else {
+      locationSearchController.closeView(query);
+      locationSearchController.openView();
+    }
   }
 
   InputDecoration iconTextFieldDecoration({
@@ -131,45 +161,12 @@ class _CreateDiaryBottomSheetState extends State<CreateDiaryBottomSheet> {
   );
 
   @override
-  Widget build(BuildContext context) => Form(
-    key: _formKey,
-    child: Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
-      child: ListView(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(
-              top: 16,
-              left: 24,
-              right: 24,
-              bottom: 8,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Novo Diário',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  style: TextButton.styleFrom(
-                    foregroundColor: Theme.of(context).colorScheme.primary,
-                    textStyle: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  child: Text('Cancelar'),
-                ),
-              ],
-            ),
-          ),
-          Stack(
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Form(
+          key: _formKey,
+          child: Stack(
             children: [
               InkWell(
                 onTap: () async {
@@ -246,55 +243,121 @@ class _CreateDiaryBottomSheetState extends State<CreateDiaryBottomSheet> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   spacing: 16,
                   children: [
-                    SearchAnchor.bar(
-                      searchController: locationSearchController,
-                      barLeading: SvgPicture.asset(
-                        AssetImages.iconLocationPin,
-                        width: 24,
-                        height: 24,
-                      ),
-                      viewLeading: SvgPicture.asset(
-                        AssetImages.iconLocationPin,
-                        width: 24,
-                        height: 24,
-                      ),
-                      barHintText: 'Localização',
-                      barPadding: WidgetStatePropertyAll(
-                        EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      ),
-                      viewBuilder: (suggestions) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 30),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: suggestions.toList(),
-                          ),
+                    FormField(
+                      validator: (_) {
+                        if (widget.diary == null && selectedPlace == null) {
+                          return 'Por favor, selecione um local';
+                        }
+
+                        return null;
+                      },
+                      builder: (formState) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SearchAnchor.bar(
+                              searchController: locationSearchController,
+                              barLeading: SvgPicture.asset(
+                                AssetImages.iconLocationPin,
+                                width: 24,
+                                height: 24,
+                              ),
+                              viewLeading: SvgPicture.asset(
+                                AssetImages.iconLocationPin,
+                                width: 24,
+                                height: 24,
+                              ),
+                              barSide: WidgetStateProperty.resolveWith((_) {
+                                if (formState.hasError) {
+                                  return BorderSide(
+                                    color: Color(0xFFEE443F),
+                                    width: 1.5,
+                                  );
+                                }
+
+                                return BorderSide(
+                                  color: Color(0xFFE5E7EA),
+                                  width: 1.5,
+                                );
+                              }),
+                              barHintText: 'Localização',
+                              barPadding: WidgetStatePropertyAll(
+                                EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 10,
+                                ),
+                              ),
+                              viewBuilder: (suggestions) {
+                                return ValueListenableBuilder(
+                                  valueListenable: createDiaryState,
+                                  builder: (context, state, _) {
+                                    return switch (state) {
+                                      CreateDiaryError error => Center(
+                                        child: Text(error.message),
+                                      ),
+                                      CreateDiaryLoading _ => Center(
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                      CreateDiarySuccess success =>
+                                        ListView.builder(
+                                          padding: EdgeInsets.zero,
+                                          itemCount: success.places.length,
+                                          itemBuilder: (context, index) {
+                                            final place = success.places
+                                                .elementAt(index);
+                                            final formattedLocation =
+                                                place.formattedLocation;
+
+                                            return InkWell(
+                                              onTap: () {
+                                                setState(() {
+                                                  locationSearchController
+                                                      .closeView(
+                                                        formattedLocation,
+                                                      );
+                                                  selectedPlace = place;
+                                                  lastQuery = formattedLocation;
+                                                  _debounce?.cancel();
+                                                });
+                                              },
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(
+                                                  12,
+                                                ),
+                                                child: Text(
+                                                  formattedLocation,
+                                                  style: TextStyle(
+                                                    fontFamily: 'Inter',
+                                                    fontSize: 14,
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                    color: Color(0xFF131927),
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      _ => SizedBox.shrink(),
+                                    };
+                                  },
+                                );
+                              },
+                              suggestionsBuilder: (context, controller) {
+                                return [];
+                              },
+                              isFullScreen: false,
+                            ),
+                            if (formState.hasError) const SizedBox(height: 4),
+                            if (formState.hasError &&
+                                formState.errorText != null)
+                              Text(
+                                formState.errorText!,
+                                style: TextStyle(color: Color(0xFFEE443F)),
+                              ),
+                          ],
                         );
                       },
-                      suggestionsBuilder: (context, controller) {
-                        return List.generate(places.length, (index) {
-                          final place = places.elementAt(index);
-                          final address = place.address;
-                          String placeName = place.name;
-
-                          if (address != null) {
-                            placeName =
-                                '${address.amenity}, ${address.road} - ${address.city} - ${address.country}';
-                          }
-
-                          return InkWell(
-                            onTap: () {
-                              setState(() {
-                                controller.closeView(placeName);
-                                controller.text = placeName;
-                                selectedPlace = place;
-                              });
-                            },
-                            child: Text(placeName),
-                          );
-                        });
-                      },
-                      isFullScreen: false,
                     ),
                     TextFormField(
                       controller: _tripNameController,
@@ -387,7 +450,9 @@ class _CreateDiaryBottomSheetState extends State<CreateDiaryBottomSheet> {
                             ),
                             Builder(
                               builder: (context) {
-                                if (tripImages.isEmpty) return SizedBox.shrink();
+                                if (tripImages.isEmpty) {
+                                  return SizedBox.shrink();
+                                }
                                 return Padding(
                                   padding: const EdgeInsets.only(top: 12),
                                   child: Wrap(
@@ -457,10 +522,12 @@ class _CreateDiaryBottomSheetState extends State<CreateDiaryBottomSheet> {
                       ),
                       padding: EdgeInsets.all(16),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Text('Nota para a viagem'),
                           const SizedBox(height: 16),
-                          StarRating(
+                          StarRating(        
+                            initialRating: rating,                    
                             onRatingChanged: (newRating) {
                               setState(() {
                                 rating = newRating;
@@ -493,79 +560,94 @@ class _CreateDiaryBottomSheetState extends State<CreateDiaryBottomSheet> {
               ),
             ],
           ),
-          const SizedBox(height: 32),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: FilledButton(
-              onPressed: () async {
-                try {
-                  if (!_formKey.currentState!.validate()) {
-                    return;
-                  }
+        ),
+        const SizedBox(height: 32),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: FilledButton(
+            onPressed: () async {
+              try {
+                if (!_formKey.currentState!.validate()) {
+                  return;
+                }
 
-                  if (selectedImage == null) {
-                    showError("Por favor, selecione uma imagem de capa");
-                    return;
-                  }
+                if (widget.diary == null && selectedPlace == null) {
+                  widget.onError?.call("Por favor, selecione um local");
+                  return;
+                }
 
-                  final ownerId = FirebaseAuth.instance.currentUser?.uid;
-                  if (ownerId == null) {
-                    showError("Usuário não autenticado");
-                    return;
-                  }
+                if (selectedImage == null) {
+                  widget.onError?.call(
+                    "Por favor, selecione uma imagem de capa",
+                  );
+                  return;
+                }
+
+                final ownerId = FirebaseAuth.instance.currentUser?.uid;
+                if (ownerId == null) {
+                  widget.onError?.call("Usuário não autenticado");
+                  return;
+                }
+                setState(() {
+                  isLoading = true;
+                });
+
+                await widget.onSubmit(
+                  DiaryFormResult(
+                    selectedImage: selectedImage!,
+                    tripImages: tripImages,
+                    ownerId: ownerId,
+                    selectedPlace: selectedPlace,
+                    name: _tripNameController.text,
+                    resume: _resumeController.text,
+                    rating: rating,
+                    isPrivate: isPrivate,
+                    latitude: selectedPlace?.latitude,
+                    longitude: selectedPlace?.longitude,
+                  ),
+                );
+              } catch (error, stackTrace) {
+                log(
+                  "Error on diary form",
+                  error: error,
+                  stackTrace: stackTrace,
+                );
+                widget.onError?.call(null);
+              } finally {
+                if (mounted) {
                   setState(() {
-                    isLoading = true;
+                    isLoading = false;
                   });
-                  await DiaryRepository().createDiary(
-                    diary: CreateDiaryModel(
-                      ownerId: ownerId,
-                      location: locationSearchController.text,
-                      name: _tripNameController.text,
-                      coverImage: selectedImage?.path ?? '',
-                      resume: _resumeController.text,
-                      images: tripImages.map((image) => image.path).toList(),
-                      rating: rating,
-                      isPrivate: isPrivate,
+                }
+              }
+            },
+            child: Builder(
+              builder: (context) {
+                if (isLoading) {
+                  return SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 3.5,
                     ),
                   );
-                  if (context.mounted) {
-                    Navigator.of(context).pop();
-                    showSuccess();
-                  }
-                } catch (error, stackTrace) {
-                  log(
-                    "Error creating diary",
-                    error: error,
-                    stackTrace: stackTrace,
-                  );
-                  showError("Erro ao criar diário");
-                } finally {
-                  if (mounted) {
-                    setState(() {
-                      isLoading = false;
-                    });
-                  }
                 }
+                return Text(widget.buttonTitle);
               },
-              child: Builder(
-                builder: (context) {
-                  if (isLoading) {
-                    return SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 3.5,
-                      ),
-                    );
-                  }
-                  return Text('Salvar Diário');
-                },
-              ),
             ),
           ),
-        ],
-      ),
-    ),
-  );
+        ),
+      ],
+    );
+  }
+
+  Future<String> uploadImage(File image) async {
+    final fileType = image.path.split('.').last;
+    final imageId = Uuid().v4();
+    final filename = '$imageId.$fileType';
+    final supabase = Supabase.instance.client;
+    await supabase.storage.from('images').upload(filename, image);
+    return supabase.storage.from('images').getPublicUrl(filename);
+  }
 }

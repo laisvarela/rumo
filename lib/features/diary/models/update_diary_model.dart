@@ -1,5 +1,6 @@
 
-class CreateDiaryModel {
+class UpdateDiaryModel {
+  final String diaryId;
   final String ownerId;
   final String location;
   final String name;
@@ -11,7 +12,8 @@ class CreateDiaryModel {
   final double latitude;
   final double longitude;
 
-  CreateDiaryModel({
+  UpdateDiaryModel({
+    required this.diaryId,
     required this.ownerId,
     required this.location,
     required this.name,

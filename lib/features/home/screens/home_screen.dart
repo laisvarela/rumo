@@ -1,9 +1,10 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:rumo/core/asset_images.dart';
 import 'package:rumo/features/diary/screens/diary_screen.dart';
 import 'package:rumo/features/home/widgets/bottom_nav_item.dart';
 import 'package:rumo/features/user/screens/profile_screen.dart';
-import 'package:rumo/features/diary/widgets/create_diary_bottom_sheet.dart';
+import 'package:rumo/features/diary/widgets/create_diary_bottom_sheet/create_diary_bottom_sheet.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -43,29 +44,34 @@ class _HomeScreenState extends State<HomeScreen> {
                 onSelectItem: onSelectItem,
               ),
               BottomNavItem(
-                icon: AssetImages.iconDiary,
+                icon: AssetImages.iconDiaries,
                 label: 'Diários',
                 currentSelectedIndex: currentIndex,
                 index: 1,
                 onSelectItem: onSelectItem,
               ),
-              IconButton.filled(
-                style: IconButton.styleFrom(backgroundColor: Color(0xFFDDE1FF)),
-                onPressed: () {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.height * 0.9,
-                    ),
-                    builder: (context) => CreateDiaryBottomSheet(),
-                  );
-                },
-                iconSize: 28,
-                icon: Icon(Icons.add, color: Theme.of(context).primaryColor),
+              Builder(
+                builder: (context) => IconButton.filled(
+                  style: IconButton.styleFrom(
+                    backgroundColor: Color(0xFFDDE1FF),
+                  ),
+                  onPressed: () {
+                    log("cliclado");
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.height * 0.9,
+                      ),
+                      builder: (context) => CreateDiaryBottomSheet(),
+                    );
+                  },
+                  iconSize: 28,
+                  icon: Icon(Icons.add, color: Theme.of(context).primaryColor),
+                ),
               ),
               BottomNavItem(
-                icon: AssetImages.iconCompass,
+                icon: AssetImages.iconExplore,
                 label: 'Explorar',
                 currentSelectedIndex: currentIndex,
                 index: 2,
@@ -85,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Builder(
         builder: (context) {
           return switch (currentIndex) {
-            1 => DiariesScreen(),
+            1 => UserDiariesScreen(),
             2 => Center(child: Text('Explorar')),
             3 => ProfileScreen(),
             _ => Scaffold(

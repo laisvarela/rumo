@@ -67,6 +67,9 @@ class AuthRepository {
       throw AuthException(code: e.code);
     }
   }
+    User? getCurrentUser() {
+      return FirebaseAuth.instance.currentUser;
+    }
 }
 
 class AuthException implements Exception {

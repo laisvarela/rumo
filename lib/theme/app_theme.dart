@@ -12,6 +12,53 @@ class AppTheme {
     return ThemeData(
       fontFamily: 'Inter',
       colorScheme: colorScheme,
+      searchViewTheme: SearchViewThemeData(
+        constraints: BoxConstraints(maxHeight: 250),
+        backgroundColor: Color(0xFFF9FAFB),
+        side: BorderSide(color: Color(0xFFE5E7EA), width: 1.5),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 6,
+        headerHintStyle: TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: Color(0xFF757575),
+        ),
+        headerTextStyle: TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 14,
+          fontWeight: FontWeight.normal,
+          color: Color(0xFF1E1E1E),
+        ),
+        dividerColor: Colors.transparent,
+        barPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      ),
+      searchBarTheme: SearchBarThemeData(
+        backgroundColor: WidgetStatePropertyAll(Color(0xFFF9FAFB)),
+        side: WidgetStatePropertyAll(
+          BorderSide(color: Color(0xFFE5E7EA), width: 1.5),
+        ),
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+        elevation: WidgetStatePropertyAll(0),
+        hintStyle: WidgetStatePropertyAll(
+          TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF757575),
+          ),
+        ),
+        textStyle: WidgetStatePropertyAll(
+          TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 14,
+            fontWeight: FontWeight.normal,
+            color: Color(0xFF1E1E1E),
+          ),
+        ),
+      ),
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: Color(0xFFFFFFFF),
         shape: RoundedRectangleBorder(
@@ -100,8 +147,8 @@ class AppTheme {
       dialogTheme: DialogThemeData(backgroundColor: colorScheme.surface),
 
       switchTheme: SwitchThemeData(
-        trackColor: WidgetStateProperty.resolveWith((states){
-          if(states.contains(WidgetState.selected)) {
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
             return Color(0xFF4E61F6);
           }
           return Color(0xFFE5E7EA);
@@ -110,6 +157,25 @@ class AppTheme {
         thumbIcon: WidgetStatePropertyAll(const Icon(null)),
         trackOutlineColor: WidgetStatePropertyAll(Colors.transparent),
         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
+      listTileTheme: ListTileThemeData(
+        tileColor: Color(0xFFF5F5F5),
+        contentPadding: EdgeInsets.all(12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        horizontalTitleGap: 10,
+      ),
+      menuButtonTheme: MenuButtonThemeData(
+        style: MenuItemButton.styleFrom(
+          padding: EdgeInsets.symmetric(horizontal: 26, vertical: 4),
+          maximumSize: Size.fromWidth(120),
+        ),
+      ),
+      menuTheme: MenuThemeData(
+        style: MenuStyle(
+          shape: WidgetStatePropertyAll(
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+        ),
       ),
     );
   }

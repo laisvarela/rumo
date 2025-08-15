@@ -18,7 +18,6 @@ class SignOutBottomSheet extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Expanded nesse caso é usado para que o texto ocupe o espaço, deixando o botão de fechar no final
               Expanded(
                 child: Text(
                   'Sair da conta',
@@ -51,22 +50,11 @@ class SignOutBottomSheet extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 32),
-          SizedBox(
-            width: double.maxFinite,
-            child: FilledButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                "Permanecer na minha conta",
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-            ),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text("Permanecer na minha conta"),
           ),
           const SizedBox(height: 12),
           Center(

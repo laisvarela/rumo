@@ -1,11 +1,11 @@
 import 'dart:developer';
-import 'package:location/location.dart' as loc;
-import 'package:geolocator/geolocator.dart' as geo;
+
+import 'package:location/location.dart';
 
 class LocationService {
-  final loc.Location location = loc.Location();
+  final Location location = Location();
 
-  Future<loc.LocationData?> askAndGetUserLocation() async {
+  Future<LocationData?> askAndGetUserLocation() async {
     try {
       bool serviceEnabled = await location.serviceEnabled();
       if (!serviceEnabled) {
@@ -15,15 +15,15 @@ class LocationService {
         }
       }
 
-      loc.PermissionStatus permissionGranted = await location.hasPermission();
-      if (permissionGranted == loc.PermissionStatus.denied) {
+      PermissionStatus permissionGranted = await location.hasPermission();
+      if (permissionGranted == PermissionStatus.denied) {
         permissionGranted = await location.requestPermission();
-        if (permissionGranted != loc.PermissionStatus.granted) {
+        if (permissionGranted != PermissionStatus.granted) {
           return null;
         }
       }
 
-      await location.changeSettings(accuracy: loc.LocationAccuracy.balanced);
+      await location.changeSettings(accuracy: LocationAccuracy.balanced);
 
       final userPosition = await location.getLocation();
       if (userPosition.latitude == null || userPosition.longitude == null) {
@@ -35,27 +35,5 @@ class LocationService {
       log("Error getting user location", error: e);
       return null;
     }
-  }
-
-  Future<geo.Position?> getLocationWebSafe() async {
-    bool serviceEnabled = await geo.Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return null;
-    }
-
-    geo.LocationPermission permission = await geo.Geolocator.checkPermission();
-    if (permission == geo.LocationPermission.denied) {
-      permission = await geo.Geolocator.requestPermission();
-      if (permission == geo.LocationPermission.denied) {
-        return null;
-      }
-    }
-
-    return await geo.Geolocator.getCurrentPosition(
-      locationSettings: geo.LocationSettings(
-        accuracy: geo.LocationAccuracy.medium,
-        distanceFilter: 10,
-      ),
-    );
   }
 }
