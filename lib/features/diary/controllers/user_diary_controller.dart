@@ -37,7 +37,7 @@ class UserDiaryController extends AutoDisposeAsyncNotifier<List<DiaryModel>> {
 
     final diaryIndex = diaries.indexWhere((diary) => diary.id == updatedDiaryModel.diaryId);
     if (diaryIndex == -1) return;
-
+  
     final updatedDiary = DiaryModel(
       id: updatedDiaryModel.diaryId,
       ownerId: updatedDiaryModel.ownerId,
