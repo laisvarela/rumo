@@ -35,7 +35,7 @@ class UserStatsBottomSheet extends StatelessWidget {
                     controller: controller,
                     children: [
                       Consumer(
-                        builder: (_, WidgetRef ref, __) {
+                        builder: (_, WidgetRef ref, _) {
                           final user = ref.watch(userInfoProvider).valueOrNull;
                           return Row(
                             crossAxisAlignment: CrossAxisAlignment.center,

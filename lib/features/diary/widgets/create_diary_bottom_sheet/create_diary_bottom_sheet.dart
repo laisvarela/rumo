@@ -80,7 +80,7 @@ class _CreateDiaryBottomSheetState extends State<CreateDiaryBottomSheet> {
           ),
         ),
         Consumer(
-          builder: (_, WidgetRef ref, __) {
+          builder: (_, WidgetRef ref, _) {
             return DiaryForm(
               buttonTitle: 'Salvar Diário',
               onError: (message) {

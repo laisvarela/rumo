@@ -115,7 +115,7 @@ class _UserDiariesScreenState extends ConsumerState<UserDiariesScreen> {
               children: [
                 TileLayer(
                   urlTemplate: 'https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=$mapKey',
-                  userAgentPackageName: 'br.com.othavioh.rumo',
+                  userAgentPackageName: 'br.com.lais.rumo',
                 ),
                 Builder(
                   builder: (context) {

@@ -104,7 +104,7 @@ class _CommunityDiariesMapScreenState extends ConsumerState<CommunityDiariesMapS
             children: [
               TileLayer(
                 urlTemplate: 'https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=${AppEnvironment.mapTileKey}',
-                userAgentPackageName: 'br.com.othavioh.rumo',
+                userAgentPackageName: 'br.com.lais.rumo',
               ),
               Consumer(
                 builder: (context, ref, _) {
