@@ -2,11 +2,12 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rumo/features/diary/controllers/user_diary_controller.dart';
 import 'package:rumo/features/diary/models/create_diary_model.dart';
 import 'package:rumo/features/diary/repositories/diary_repository.dart';
 import 'package:rumo/features/diary/widgets/diary_form/diary_form.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:uuid/uuid.dart';
+import 'package:rumo/repositories/image_upload_repository.dart';
 
 class CreateDiaryBottomSheet extends StatefulWidget {
   const CreateDiaryBottomSheet({super.key});
@@ -78,48 +79,53 @@ class _CreateDiaryBottomSheetState extends State<CreateDiaryBottomSheet> {
             ],
           ),
         ),
-        DiaryForm(
-          buttonTitle: 'Salvar Diário',
-          onError: (message) {
-            if(message == null) {
-              showError("Erro ao criar diário");
-              return;
-            }
-            showError(message);
-          },
-          onSubmit: (result) async {
+        Consumer(
+          builder: (_, WidgetRef ref, __) {
+            return DiaryForm(
+              buttonTitle: 'Salvar Diário',
+              onError: (message) {
+                if (message == null) {
+                  showError("Erro ao criar diário");
+                  return;
+                }
+                showError(message);
+              },
+              onSubmit: (result) async {
+                if (result.selectedPlace == null || result.latitude == null || result.longitude == null) {
+                  showError("Por favor, selecione um local");
+                  return;
+                }
 
-            if(result.selectedPlace == null || result.latitude == null || result.longitude == null) {
-              showError("Por favor, selecione um local");
-              return;
-            }
+                final coverUrl = await uploadImage(result.selectedImage);
 
-            final coverUrl = await uploadImage(result.selectedImage);
+                final tripImagesUploads = result.tripImages.map((image) {
+                  return uploadImage(image);
+                });
 
-            final tripImagesUploads = result.tripImages.map((image) {
-              return uploadImage(image);
-            });
+                final tripImagesUrls = await Future.wait(tripImagesUploads);
 
-            final tripImagesUrls = await Future.wait(tripImagesUploads);
+                final diary = CreateDiaryModel(
+                  ownerId: result.ownerId,
+                  location: result.selectedPlace!.formattedLocation,
+                  name: result.name,
+                  coverImage: coverUrl,
+                  resume: result.resume,
+                  images: tripImagesUrls,
+                  rating: result.rating,
+                  isPrivate: result.isPrivate,
+                  latitude: result.latitude!,
+                  longitude: result.longitude!,
+                );
 
-            final diary = CreateDiaryModel(
-              ownerId: result.ownerId,
-              location: result.selectedPlace!.formattedLocation,
-              name: result.name,
-              coverImage: coverUrl,
-              resume: result.resume,
-              images: tripImagesUrls,
-              rating: result.rating,
-              isPrivate: result.isPrivate,
-              latitude: result.latitude!,
-              longitude: result.longitude!,
+                await DiaryRepository().createDiary(diary: diary);
+
+                if (context.mounted) {
+                  ref.invalidate(userDiaryControllerProvider);
+                  Navigator.of(context).pop();
+                  showSuccess();
+                }
+              },
             );
-
-            await DiaryRepository().createDiary(diary: diary);
-            if (context.mounted) {
-              Navigator.of(context).pop();
-              showSuccess();
-            }
           },
         ),
       ],
@@ -127,11 +133,6 @@ class _CreateDiaryBottomSheetState extends State<CreateDiaryBottomSheet> {
   );
 
   Future<String> uploadImage(File image) async {
-    final fileType = image.path.split('.').last;
-    final imageId = Uuid().v4();
-    final filename = '$imageId.$fileType';
-    final supabase = Supabase.instance.client;
-    await supabase.storage.from('images').upload(filename, image);
-    return supabase.storage.from('images').getPublicUrl(filename);
+    return ImageUploadRepository().uploadImage(image);
   }
 }

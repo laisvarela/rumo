@@ -1,11 +1,12 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rumo/core/asset_images.dart';
-import 'package:rumo/features/user/controller/profile_controller.dart';
+import 'package:rumo/features/user/controllers/profile_controller.dart';
 import 'package:rumo/features/user/widgets/sign_out_bottom_sheet.dart';
 import 'package:rumo/repositories/image_upload_repository.dart';
 
@@ -14,7 +15,11 @@ class ProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final userAsync = ref.watch(profileControllerProvider);
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Perfil'),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -22,7 +27,6 @@ class ProfileScreen extends ConsumerWidget {
             children: [
               Builder(
                 builder: (context) {
-                  final userAsync = ref.watch(profileControllerProvider);
                   if (userAsync.isLoading) {
                     return CircularProgressIndicator();
                   }
@@ -43,7 +47,11 @@ class ProfileScreen extends ConsumerWidget {
                       ref.read(profileControllerProvider.notifier).changeImage(imageUrl);
                     },
                     child: Container(
-                      color: Colors.grey,
+                      decoration: BoxDecoration(
+                        color: Color(0xFFF5F5F5),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      padding: EdgeInsets.all(16),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         spacing: 16,
@@ -51,12 +59,12 @@ class ProfileScreen extends ConsumerWidget {
                           ClipRRect(
                             borderRadius: BorderRadius.circular(50),
                             clipBehavior: Clip.antiAlias,
-                            child: Image.network(
-                              user?.photoURL ?? '',
+                            child: CachedNetworkImage(
+                              imageUrl: user?.photoURL ?? '',
                               width: 52,
                               height: 52,
                               fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
+                              errorWidget: (context, error, stackTrace) {
                                 return Container(
                                   padding: EdgeInsets.all(10),
                                   decoration: BoxDecoration(color: Color(0xFF7584FA), shape: BoxShape.circle),
@@ -71,7 +79,14 @@ class ProfileScreen extends ConsumerWidget {
                             ),
                           ),
                           Expanded(
-                            child: Text('Toque para alterar a foto'),
+                            child: Text(
+                              'Toque para alterar a foto',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14,
+                                color: Color(0xFF2C2C2C),
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -79,6 +94,46 @@ class ProfileScreen extends ConsumerWidget {
                   );
                 },
               ),
+              const SizedBox(height: 16),
+              Container(
+                decoration: BoxDecoration(
+                  color: Color(0xFFF5F5F5),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                padding: EdgeInsets.all(16),
+                child: Builder(
+                  builder: (context) {
+                    if (userAsync.isLoading) {
+                      return CircularProgressIndicator();
+                    }
+                    final user = userAsync.valueOrNull;
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Nome: ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 12,
+                            color: Color(0xFF767676),
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            (user?.displayName ?? ''),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 14,
+                              color: Color(0xFF2C2C2C),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 80),
               OutlinedButton(
                 onPressed: () {
                   showModalBottomSheet(
