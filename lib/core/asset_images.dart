@@ -1,7 +1,8 @@
 class AssetImages {
   static const String _assetsPath = 'assets/images';
   static const String logo = '$_assetsPath/logo.svg';
-  static const String onboardingCharacter ='$_assetsPath/onboarding_character.png';
+  static const String onboardingCharacter =
+      '$_assetsPath/onboarding_character.png';
   static const String createAccountCharacter = '$_assetsPath/create_account_character.png';
   static const String loginCharacter = '$_assetsPath/login_character.png';
   static const String iconMap = '$_assetsPath/icon_map.svg';
@@ -19,5 +20,9 @@ class AssetImages {
   static const String iconDotsMenu = '$_assetsPath/icon_dots_menu.svg';
   static const String diaryCounterCharacter = '$_assetsPath/diary_counter_character.png';
   static const String iconChevronDown = '$_assetsPath/icon_chevron_down.svg';
+  static const String iconHeart = '$_assetsPath/icon_heart.svg';
+  static const String iconEmptyHeart = '$_assetsPath/icon_empty_heart.svg';
+  static const String iconChat = '$_assetsPath/icon_chat.svg';
+  static const String iconCalendar = '$_assetsPath/icon_calendar.svg';
   static const String profileAvatar = '$_assetsPath/profile_avatar.png';
 }

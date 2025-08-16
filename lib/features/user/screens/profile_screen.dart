@@ -1,131 +1,98 @@
-import 'package:flutter/material.dart';
-import 'package:rumo/core/asset_images.dart';
-import 'package:rumo/features/user/widgets/sign_out_bottom_sheet.dart';
+import 'dart:io';
 
-class ProfileScreen extends StatefulWidget {
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:rumo/core/asset_images.dart';
+import 'package:rumo/features/user/controller/profile_controller.dart';
+import 'package:rumo/features/user/widgets/sign_out_bottom_sheet.dart';
+import 'package:rumo/repositories/image_upload_repository.dart';
+
+class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
-}
-
-class _ProfileScreenState extends State<ProfileScreen> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Padding(
-        padding: EdgeInsets.only(top: 24, left: 24, right: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Perfil",
-              style: TextStyle(
-                fontFamily: "Inter",
-                fontSize: 24,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF1E1E1E),
-              ),
-            ),
-            SizedBox(height: 24),
-            SizedBox(
-              width: double.maxFinite,
-              child: FilledButton(
-                onPressed: () {},
-                style: FilledButton.styleFrom(
-                  backgroundColor: Color(0xFFF5F5F5),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        top: 16,
-                        left: 16,
-                        right: 16,
-                        bottom: 16,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            children: [
+              Builder(
+                builder: (context) {
+                  final userAsync = ref.watch(profileControllerProvider);
+                  if (userAsync.isLoading) {
+                    return CircularProgressIndicator();
+                  }
+                  final user = userAsync.valueOrNull;
+                  return InkWell(
+                    onTap: () async {
+                      final imagePicker = ImagePicker();
+
+                      final file = await imagePicker.pickImage(
+                        source: ImageSource.gallery,
+                      );
+                      if (file == null) return;
+
+                      final image = File(file.path);
+
+                      final imageUrl = await ImageUploadRepository().uploadImage(image);
+
+                      ref.read(profileControllerProvider.notifier).changeImage(imageUrl);
+                    },
+                    child: Container(
+                      color: Colors.grey,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        spacing: 16,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(50),
+                            clipBehavior: Clip.antiAlias,
+                            child: Image.network(
+                              user?.photoURL ?? '',
+                              width: 52,
+                              height: 52,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  padding: EdgeInsets.all(10),
+                                  decoration: BoxDecoration(color: Color(0xFF7584FA), shape: BoxShape.circle),
+                                  child: SvgPicture.asset(
+                                    AssetImages.iconCamera,
+                                    fit: BoxFit.cover,
+                                    width: 28,
+                                    height: 28,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          Expanded(
+                            child: Text('Toque para alterar a foto'),
+                          ),
+                        ],
                       ),
-                      child: Image.asset(AssetImages.profileAvatar),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 32, bottom: 32),
-                      child: Text(
-                        'Toque para alterar a foto',
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xFF2C2C2C),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                  );
+                },
               ),
-            ),
-            SizedBox(height: 17),
-            Column(
-              spacing: 8,
-              children: [
-                TextFormField(
-                  decoration: InputDecoration(
-                    hintText: 'Nome:',
-                    hintStyle: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 14,
-                      color: Color(0xFF767676),
-                    ),
-                    filled: true,
-                    fillColor: Color(0xFFF5F5F5),
-                    enabled: false,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
-                TextFormField(
-                  decoration: InputDecoration(
-                    hintText: 'Cidade:',
-                    hintStyle: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 14,
-                      color: Color(0xFF767676),
-                    ),
-                    filled: true,
-                    fillColor: Color(0xFFF5F5F5),
-                    enabled: false,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
-            SizedBox(
-              width: double.maxFinite,
-              child: OutlinedButton(
+              OutlinedButton(
                 onPressed: () {
                   showModalBottomSheet(
                     context: context,
-                    builder: (context) => SignOutBottomSheet(),
+                    builder: (context) {
+                      return SignOutBottomSheet();
+                    },
                   );
                 },
-                child: Text(
-                  "Sair",
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF4E61F6),
-                  ),
-                ),
+                style: OutlinedButton.styleFrom(minimumSize: Size.fromHeight(48)),
+                child: Text('Sair'),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

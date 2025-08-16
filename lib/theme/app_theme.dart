@@ -112,6 +112,7 @@ class AppTheme {
             decoration: TextDecoration.underline,
             decorationColor: Colors.black,
           ),
+          padding: EdgeInsets.all(16),
         ),
       ),
 
@@ -126,6 +127,10 @@ class AppTheme {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Color(0xFFE5E7EA), width: 1.5),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Color(0xFF4E61F6), width: 1.5),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -177,6 +182,34 @@ class AppTheme {
           ),
         ),
       ),
+      chipTheme: ChipThemeData(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        padding: EdgeInsets.all(4),
+        avatarBoxConstraints: BoxConstraints(
+          maxWidth: 20,
+          maxHeight: 20,
+        ),
+        labelPadding: EdgeInsets.only(
+          right: 4,
+          left: 4,
+        ),
+        labelStyle: TextStyle(
+          fontWeight: FontWeight.w500,
+          fontSize: 10,
+          color: Color(0xFF131927),
+        ),
+        side: BorderSide.none,
+      ),
+      appBarTheme: AppBarTheme(
+        titleTextStyle: TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 24,
+          fontWeight: FontWeight.w600,
+          color: Color(0xFF1E1E1E),
+        )
+      )
     );
   }
 }

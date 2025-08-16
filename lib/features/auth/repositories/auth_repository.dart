@@ -67,9 +67,16 @@ class AuthRepository {
       throw AuthException(code: e.code);
     }
   }
-    User? getCurrentUser() {
-      return FirebaseAuth.instance.currentUser;
-    }
+
+  User? getCurrentUser() {
+    return FirebaseAuth.instance.currentUser;
+  }
+
+  Future<void> changeUserImage(String imageUrl) async {
+    final user = getCurrentUser();
+    if(user == null) return;
+    return user.updatePhotoURL(imageUrl);
+  }
 }
 
 class AuthException implements Exception {
